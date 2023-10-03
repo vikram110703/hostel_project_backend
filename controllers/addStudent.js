@@ -12,12 +12,13 @@ export const newStudent = async (req, resp, next) => {
         }
 
         const student = await Students.findOne({
-            $or: [{
-                $and: [
-                    { name }, { hostelName }, { block }, { roomNo }
-                ]
-            },
-            { enrollmentNo: adjustedEnrollmentNo },
+            $or: [
+                {
+                    $and: [
+                         { hostelName }, { block }, { roomNo }
+                    ]
+                },
+                { enrollmentNo: adjustedEnrollmentNo },
 
             ]
         });

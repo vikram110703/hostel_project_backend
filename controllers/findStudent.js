@@ -38,7 +38,13 @@ export const getStudent = async (req, resp, next) => {
         }
 
         // console.log("tyep: ",typeof(students));
-        resp.status(201).json(students);
+        // resp.status(201).json(students);
+        resp.status(201).json({
+            sucess:true,
+            message:`Yha hai ${name} 😋`,
+            students
+        })
+        
 
     } catch (error) {
         next(error);
