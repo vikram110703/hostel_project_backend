@@ -6,8 +6,8 @@ export const getStudent = async (req, resp, next) => {
     try {
         const { name, branch, state, enrollmentNo, year } = req.body;
 
-        const avlData = { name };
-        if (name) {
+        const avlData = {};
+        if (name && name !== ' ') {
             avlData.name = {
                 $regex: name,
                 $options: "i",
@@ -27,6 +27,9 @@ export const getStudent = async (req, resp, next) => {
                 $options: "i",
             }
         }
+        if (Object.keys(avlData).length === 0) {
+            return next(new ErrorHandler("Please fill at least one field"), 400);
+        }
         // console.log("avl : ",avlData);
 
         const students = await Students.find(avlData);
@@ -40,11 +43,11 @@ export const getStudent = async (req, resp, next) => {
         // console.log("tyep: ",typeof(students));
         // resp.status(201).json(students);
         resp.status(201).json({
-            sucess:true,
-            message:`Yha hai ${name} 😋`,
-            students
+            sucess: true,
+            message: `Yha hai ${name} 😋`,
+            students,
         })
-        
+
 
     } catch (error) {
         next(error);
@@ -52,41 +55,23 @@ export const getStudent = async (req, resp, next) => {
 }
 
 export const getAllStudents = async (req, resp, next) => {
+
     try {
-        const { name, branch, state, enrollmentNo, year } = req.body;
-
         const avlData = {};
-        if (name) avlData.name = name;
-        if (branch) avlData.branch = branch;
-        if (year) avlData.year = year;
-        if (state) avlData.state = state;
-        if (enrollmentNo) avlData.enrollmentNo = enrollmentNo;
 
+        // console.log("avl : ",avlData);
         const students = await Students.find(avlData);
-        if (!students || students.length == 0) {
-            return next(new ErrorHandler("Sorry! Student not found "), 400);
-        }
-
-        // console.log(students);.
-
-        const matchingStudents = students.map((student) => ({
-            name: student.name,
-            branch: student.branch,
-            state: student.state,
-            enrollmentNo: student.enrollmentNo,
-            year: student.year,
-            hostelName: student.hostelName,
-            block: student.block,
-            roomNo: student.roomNo,
-
-        }));
-        // console.log("matching students : ",matchingStudents);
-        resp.status(201).json(matchingStudents);
+        // console.log(students);
+        resp.status(201).json({
+            sucess: true,
+            message: "Ye rahe tere DOST 🤡",
+            students,
+        })
 
     } catch (error) {
         next(error);
     }
-}
+};
 
 
 

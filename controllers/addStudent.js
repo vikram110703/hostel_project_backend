@@ -15,18 +15,20 @@ export const newStudent = async (req, resp, next) => {
             $or: [
                 {
                     $and: [
-                         { hostelName }, { block }, { roomNo }
+                        { hostelName }, { block }, { roomNo }
                     ]
                 },
                 { enrollmentNo: adjustedEnrollmentNo },
 
             ]
         });
-        if (student) {
-            // console.log("Search criteria:", { name, hostelName, block, roomNo, enrollmentNo });
-            // resp.json(student);
-            return next(new ErrorHandler(" Student is already exst ", 400));
-        }
+
+        // i am removing this condition because multiple students can have same room
+        // if (student) {
+        //     // console.log("Search criteria:", { name, hostelName, block, roomNo, enrollmentNo });
+        //     // resp.json(student);
+        //     return next(new ErrorHandler(" Student is already exst ", 400));
+        // }
 
         const studentData = { name, hostelName, block, roomNo };
 
