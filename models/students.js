@@ -12,17 +12,14 @@ const schema = new mongoose.Schema({
     },
     enrollmentNo: {
         type: String,
-        unique: true,
-        maxlength: [12, 'En No should not exceed 12 char'],
-        minlength: [7, 'En No should be atleast 7 char'],
+        maxlength: [10, 'En No should not exceed 10 char'],
     },
     currentYear: {
         type: String,
     },
     state: {
         type: String,
-        maxlength: [25, 'En No should not exceed 25 char'],
-        minlength: [3, 'En No should be atleast 3 char'],
+        maxlength: [25, 'state  should not exceed 25 char'],
     },
     hostelName: {
         type: String,
@@ -31,12 +28,13 @@ const schema = new mongoose.Schema({
     block: {
         type: String,
         required: true,
-        maxlength: [5, 'En No should not exceed 5 char'],
+        maxlength: [3, 'Block  should not exceed 3 char'],
     },
     roomNo: {
         type: Number,
         required: true,
-        maxlength: [3, 'En No should not exceed 3 char'],
+        min:[1,"Min roomNo is 1"],
+        max:[740,"Enter a valid Room no "],
     },
     year: {
         type: Number,

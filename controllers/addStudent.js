@@ -3,19 +3,44 @@ import { Students } from "../models/students.js";
 
 
 export const newStudent = async (req, resp, next) => {
+
+    function hasAbusiveWords(text, profanityList) {
+        const regex = new RegExp(`(${profanityList.join('|')})`, 'i');
+        return regex.test(text);
+      }
+      
+
+
     try {
         const { name, hostelName, block, roomNo, branch, enrollmentNo, state, year } = req.body;
 
-        let adjustedEnrollmentNo = enrollmentNo;
-        if (enrollmentNo === undefined || enrollmentNo == ' ') {
-            adjustedEnrollmentNo = "nhi mila";
+        let adjustedEnrollmentNo;
+        if (typeof enrollmentNo !== 'string' || enrollmentNo.trim() === '' || enrollmentNo == undefined || enrollmentNo.length == 0 || enrollmentNo == ' ' || enrollmentNo == null) {
+            adjustedEnrollmentNo = "enrollmentNo_nhi_diya";
+        } else {
+            adjustedEnrollmentNo = enrollmentNo;
         }
 
+        const profanityList = ["fuck", "lund", "madarchod", "bencho", "chutiya", "choot", "motherfucker", "sex", "sexy", "sexyy", "maa ki", "randi", "gaan", "gaandu", "lwda"];
+        // console.log(profanityList);
+
+        if (hasAbusiveWords(name, profanityList)) {
+            return next(new ErrorHandler("Abusive word detected in name", 400));
+        }
+        if (hasAbusiveWords(state, profanityList)) {
+            return next(new ErrorHandler("Abusive word detected in state", 400));
+        }
+        if (hasAbusiveWords(adjustedEnrollmentNo, profanityList)) {
+            return next(new ErrorHandler("Abusive word in Enr no ", 400));
+        }
+
+
+        // i am removing this condition because multiple students can have same room
         const student = await Students.findOne({
             $or: [
                 {
                     $and: [
-                        { hostelName }, { block }, { roomNo }
+                        { name }, { branch }, { state },{year},{ enrollmentNo: adjustedEnrollmentNo },
                     ]
                 },
                 { enrollmentNo: adjustedEnrollmentNo },
@@ -23,24 +48,30 @@ export const newStudent = async (req, resp, next) => {
             ]
         });
 
-        // i am removing this condition because multiple students can have same room
-        // if (student) {
-        //     // console.log("Search criteria:", { name, hostelName, block, roomNo, enrollmentNo });
-        //     // resp.json(student);
-        //     return next(new ErrorHandler(" Student is already exst ", 400));
-        // }
+
+        // const student = await Students.findOne({
+        //     $or: [
+
+        //         { enrollmentNo: adjustedEnrollmentNo },
+        //     ]
+        // })
+        if (student) {
+            // console.log(student);
+            return next(new ErrorHandler(" Student with this details already exist ", 400));
+        }
 
         const studentData = { name, hostelName, block, roomNo };
 
         if (state && state !== ' ') studentData.state = state;
         if (year && year !== ' ') studentData.year = year;
         if (branch && branch !== ' ') studentData.branch = branch;
-        if (enrollmentNo && enrollmentNo !== ' ') studentData.enrollmentNo = enrollmentNo;
+        if (enrollmentNo !== null && enrollmentNo !== ' ' && enrollmentNo !== undefined) studentData.enrollmentNo = enrollmentNo;
 
         await Students.create(
             studentData
         );
 
+        // console.log(studentData);
         resp.status(201).json({
             success: true,
             message: " Student added Successfully ",
