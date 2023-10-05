@@ -7,8 +7,8 @@ export const newStudent = async (req, resp, next) => {
     function hasAbusiveWords(text, profanityList) {
         const regex = new RegExp(`(${profanityList.join('|')})`, 'i');
         return regex.test(text);
-      }
-      
+    }
+
 
 
     try {
@@ -40,10 +40,11 @@ export const newStudent = async (req, resp, next) => {
             $or: [
                 {
                     $and: [
-                        { name }, { branch }, { state },{year},{ enrollmentNo: adjustedEnrollmentNo },
+                        { name: { $regex: name, $options: "i", } }, { branch},
+                        { state: { $regex: state, $options: "i", } }, { year }
                     ]
                 },
-                { enrollmentNo: adjustedEnrollmentNo },
+                { enrollmentNo: {$regex: adjustedEnrollmentNo ,$options:"i" }},
 
             ]
         });
