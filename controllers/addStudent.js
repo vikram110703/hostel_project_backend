@@ -21,8 +21,8 @@ export const newStudent = async (req, resp, next) => {
             adjustedEnrollmentNo = enrollmentNo;
         }
 
-        const profanityList = ["fuck", "lund", "madarchod", "bencho", "chutiya", "choot", "motherfucker", "sex", "sexy", "sexyy", "maa ki", "randi", "gaan", "gaandu", "lwda"];
-        // console.log(profanityList);
+        const profanityList=process.env.profanityList.split(" ");
+        //  console.log(profanityList);
 
         if (hasAbusiveWords(name, profanityList)) {
             return next(new ErrorHandler("Abusive word detected in name", 400));
