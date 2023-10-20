@@ -9,25 +9,25 @@ export const newStudent = async (req, resp, next) => {
         return regex.test(text);
     }
 
-
-
     try {
         const { name, hostelName, block, roomNo, branch, enrollmentNo, state, year } = req.body;
 
+        if(name.trim()===""||name.trim()===" ")return next(new ErrorHandler("Name can't be empty ", 400));
         let adjustedEnrollmentNo;
-        if (typeof enrollmentNo !== 'string' || enrollmentNo.trim() === '' || enrollmentNo == undefined || enrollmentNo.length == 0 || enrollmentNo == ' ' || enrollmentNo == null) {
+       
+        if (enrollmentNo.trim()===""||enrollmentNo.trim()===" ") {
             adjustedEnrollmentNo = "enrollmentNo_nhi_diya";
         } else {
-            adjustedEnrollmentNo = enrollmentNo;
+            adjustedEnrollmentNo = enrollmentNo.trim();
         }
 
-        const profanityList=process.env.profanityList.split(" ");
+        const profanityList=process.env.profanityList.split(",");
         //  console.log(profanityList);
 
-        if (hasAbusiveWords(name, profanityList)) {
+        if (hasAbusiveWords(name.trim(), profanityList)) {
             return next(new ErrorHandler("Abusive word detected in name", 400));
         }
-        if (hasAbusiveWords(state, profanityList)) {
+        if (hasAbusiveWords(state.trim(), profanityList)) {
             return next(new ErrorHandler("Abusive word detected in state", 400));
         }
         if (hasAbusiveWords(adjustedEnrollmentNo, profanityList)) {
@@ -40,8 +40,8 @@ export const newStudent = async (req, resp, next) => {
             $or: [
                 {
                     $and: [
-                        { name: { $regex: name, $options: "i", } }, { branch},
-                        { state: { $regex: state, $options: "i", } }, { year }
+                        { name: { $regex: name.trim(), $options: "i", } }, { branch},
+                        { state: { $regex: state.trim(), $options: "i", } }, { year }
                     ]
                 },
                 { enrollmentNo: {$regex: adjustedEnrollmentNo ,$options:"i" }},
@@ -61,12 +61,12 @@ export const newStudent = async (req, resp, next) => {
             return next(new ErrorHandler(" Student with this details already exist ", 400));
         }
 
-        const studentData = { name, hostelName, block, roomNo };
+        const studentData = { name:name.trim(), hostelName, block, roomNo };
 
-        if (state && state !== ' ') studentData.state = state;
-        if (year && year !== ' ') studentData.year = year;
-        if (branch && branch !== ' ') studentData.branch = branch;
-        if (enrollmentNo !== null && enrollmentNo !== ' ' && enrollmentNo !== undefined) studentData.enrollmentNo = enrollmentNo;
+        if (state.length>=1 && state.trim() !== " ") studentData.state = state.trim();
+        if (year && year !== "") studentData.year = year;
+        if (branch && branch !== "") studentData.branch = branch;
+        if (enrollmentNo.trim().length>=1&&enrollmentNo.trim()!=="") studentData.enrollmentNo = studentData.enrollmentNo = enrollmentNo.trim().toUpperCase();
 
         await Students.create(
             studentData
